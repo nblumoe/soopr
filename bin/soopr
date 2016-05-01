@@ -2,40 +2,58 @@
 
 require 'optparse'
 require 'methadone'
+require 'octokit'
 require 'soopr.rb'
+
+class String
+  # colorization
+  def colorize(color_code)
+    "\e[#{color_code}m#{self}\e[0m"
+  end
+
+  def red
+    colorize(31)
+  end
+
+  def green
+    colorize(32)
+  end
+
+  def blue
+    colorize(34)
+  end
+end
 
 class App
   include Methadone::Main
   include Methadone::CLILogging
 
-  main do # Add args you want: |like,so|
-    # your program code here
-    # You can access CLI options via
-    # the options Hash
+  main do |organisation, team|
+    Octokit.configure do |c|
+      c.netrc = true
+    end
+
+    teams = Octokit.organization_teams organisation
+    team_id = teams.find{ |t| t.name == team}.id
+    repos = Octokit.team_repositories(team_id).select{|r| r.open_issues_count > 0}
+
+    repos.each do |repo|
+      pull_requests = Octokit.pull_requests repo.id
+      if pull_requests.size > 0 then
+        puts "# #{repo.name}".red
+        pull_requests.each do |pr|
+          puts "- #{pr.title}: ".blue + "#{pr.html_url}\n\n".green
+        end
+      end
+    end
   end
 
-  # supplemental methods here
-
-  # Declare command-line interface here
-
-  # description "one line description of your app"
-  #
-  # Accept flags via:
-  # on("--flag VAL","Some flag")
-  # options[flag] will contain VAL
-  #
-  # Specify switches via:
-  # on("--[no-]switch","Some switch")
-  #
-  # Or, just call OptionParser methods on opts
-  #
-  # Require an argument
-  # arg :some_arg 
-  #
-  # # Make an argument optional
-  # arg :optional_arg, :optional
-
   version Soopr::VERSION
+
+  description 'List open pull requests of a Github team'
+
+  arg :organisation, "Github organisation the team belongs to"
+  arg :team, "Github team from which to list open pull requests"
 
   use_log_level_option :toggle_debug_on_signal => 'USR1'
 

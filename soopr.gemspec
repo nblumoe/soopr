@@ -34,4 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency('rake')
   spec.add_dependency('methadone', '~> 1.9.2')
   spec.add_development_dependency('test-unit')
+  spec.add_dependency('octokit', '~> 4.0')
+  spec.add_dependency('netrc', '~>0.11.0')
+
 end
