@@ -7,11 +7,10 @@ Gem::Specification.new do |spec|
   spec.name          = "soopr"
   spec.version       = Soopr::VERSION
   spec.authors       = ["Nils Blum-Oeste"]
-  spec.email         = ["nils.blum-oeste@wooga.net"]
+  spec.email         = ["nblumoeste@gmail.com"]
 
-  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.summary       = %q{Simple CLI tool to list open pull requests of a Github team.}
+  spec.homepage      = "https://github.com/nblumoe/soopr"
   spec.license       = "mit"
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
