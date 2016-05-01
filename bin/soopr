@@ -44,7 +44,7 @@ class App
     debug "Starting to fetch repos for team '#{team}'"
 
     repos = Octokit.team_repositories(team_resource.id)
-                .select{|r| r.open_issues_count > 10}
+                .select{|r| r.open_issues_count > 0}
 
 
     if repos.empty?
