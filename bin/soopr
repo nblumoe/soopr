@@ -33,16 +33,33 @@ class App
       c.netrc = true
     end
 
-    teams = Octokit.organization_teams organisation
-    team_id = teams.find{ |t| t.name == team}.id
-    repos = Octokit.team_repositories(team_id).select{|r| r.open_issues_count > 0}
+    debug "Starting to fetch teams for organisation '#{organisation}'"
 
-    repos.each do |repo|
-      pull_requests = Octokit.pull_requests repo.id
-      if pull_requests.size > 0 then
-        puts "# #{repo.name}".red
-        pull_requests.each do |pr|
-          puts "- #{pr.title}: ".blue + "#{pr.html_url}\n\n".green
+    teams = Octokit.organization_teams organisation
+    team_resource = teams.find{ |t| t.name == team}
+    if team_resource.nil?
+      exit_now! 1, "No team with name '#{team}' could be found"
+    end
+
+    debug "Starting to fetch repos for team '#{team}'"
+
+    repos = Octokit.team_repositories(team_resource.id)
+                .select{|r| r.open_issues_count > 10}
+
+
+    if repos.empty?
+      puts "No open pull requests found.".green
+    else
+
+      debug "Open pull requests for '#{team}':"
+
+      repos.each do |repo|
+        pull_requests = Octokit.pull_requests repo.id
+        if pull_requests.size > 0 then
+          puts "# #{repo.name}".red
+          pull_requests.each do |pr|
+            puts "- #{pr.title}: ".blue + "#{pr.html_url}\n\n".green
+          end
         end
       end
     end
