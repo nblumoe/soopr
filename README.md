@@ -4,7 +4,7 @@ SOOPR offers open pull requests
 
 ## Installation
 
-Just clone it for now.
+`gem install soopr`
 
 SOOPR assumes you have a `~/.netrc` file for Github API auth:
 
@@ -18,11 +18,11 @@ machine api.github.com
 
 Run from the project root:
 
-`bundle exec bin/soopr [organisation] [team]`
+`soopr [organisation] [team]`
 
 Usage help is available, too:
 
-`bundle exec bin/soopr --help`
+`soopr --help`
 
 ## Development
 
