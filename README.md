@@ -14,6 +14,8 @@ machine api.github.com
   password [password or oauth token]
 ```
 
+You can create a personal token to be used at https://github.com/settings/tokens
+
 ## Usage
 
 Run from the project root:
