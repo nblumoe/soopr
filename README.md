@@ -20,7 +20,7 @@ You can create a personal token to be used at https://github.com/settings/tokens
 
 Run from the project root:
 
-`soopr [organisation] [team]`
+`soopr [organisation] [team]`  (parameters are case-sensitive)
 
 Usage help is available, too:
 
