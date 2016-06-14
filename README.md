@@ -1,5 +1,7 @@
 # SOOPR
 
+[![Gem Version](https://badge.fury.io/rb/soopr.svg)](https://badge.fury.io/rb/soopr)
+
 SOOPR offers open pull requests
 
 ## Installation
