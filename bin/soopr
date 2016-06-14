@@ -5,35 +5,36 @@ require 'methadone'
 require 'octokit'
 require 'soopr.rb'
 
-class String
-  # colorization
-  def colorize(color_code)
-    "\e[#{color_code}m#{self}\e[0m"
-  end
-
-  def red
-    colorize(31)
-  end
-
-  def green
-    colorize(32)
-  end
-
-  def blue
-    colorize(34)
-  end
-end
-
 class App
   include Methadone::Main
   include Methadone::CLILogging
+
+  def self.colorize color_code, string
+    if options[:monochrome]
+      string
+    else
+      "\e[#{color_code}m#{string}\e[0m"
+    end
+  end
+
+  def self.blue string
+    colorize 34, string
+  end
+
+  def self.green string
+    colorize 32, string
+  end
+
+  def self.red string
+    colorize 31, string
+  end
 
   main do |organisation, team|
     Octokit.configure do |c|
       c.netrc = true
     end
 
-    debug "Starting to fetch teams for organisation '#{organisation}'"
+    logger.debug "Starting to fetch teams for organisation '#{organisation}'"
 
     teams = Octokit.organization_teams organisation
     team_resource = teams.find{ |t| t.name == team}
@@ -43,22 +44,26 @@ class App
 
     debug "Starting to fetch repos for team '#{team}'"
 
-    repos = Octokit.team_repositories(team_resource.id)
-                .select{|r| r.open_issues_count > 0}
+    all_repos = Octokit.team_repositories(team_resource.id)
 
+    logger.debug "All repos found for team: #{all_repos.map(&:name)}"
 
-    if repos.empty?
-      puts "No open pull requests found.".green
+    repos_with_issues = all_repos.select{|r| r.open_issues_count > 0}
+
+    debug "Repos with open issues: #{repos_with_issues.map(&:name)}"
+
+    if repos_with_issues.empty?
+      puts green "No open pull requests found."
     else
 
       debug "Open pull requests for '#{team}':"
 
-      repos.each do |repo|
+      repos_with_issues.each do |repo|
         pull_requests = Octokit.pull_requests repo.id
         if pull_requests.size > 0 then
-          puts "# #{repo.name}".red
+          puts red "# #{repo.name}"
           pull_requests.each do |pr|
-            puts "- #{pr.title}: ".blue + "#{pr.html_url}\n\n".green
+            puts blue("- #{pr.title}: ") + green("#{pr.html_url}\n\n")
           end
         end
       end
@@ -68,6 +73,8 @@ class App
   version Soopr::VERSION
 
   description 'List open pull requests of a Github team'
+
+  on "-m", "--monochrome", "Use monochrome output instead of colors"
 
   arg :organisation, "Github organisation the team belongs to"
   arg :team, "Github team from which to list open pull requests"
