@@ -32,10 +32,10 @@ class App
   main do |organisation, team|
     Octokit.configure do |c|
       c.netrc = true
+      c.auto_paginate = true
     end
 
     logger.debug "Starting to fetch teams for organisation '#{organisation}'"
-
     teams = Octokit.organization_teams organisation
     team_resource = teams.find{ |t| t.name == team}
     if team_resource.nil?
